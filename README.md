@@ -1,7 +1,17 @@
 # App Store Crawler
 
 1. [Run Locally](#run-locally)
+    * [Prerequisites](#prerequisites)
+    * [Preparation](#preparation)
+    * [Running](#running)
+    * [Testing](#testing)
+    * [Demo Clip](#demo-clip)
 2. [Run in Container](#run-in-container)
+    * [Prerequisites](#prerequisites2)
+    * [Preparation](#preparation2)
+    * [Running](#running2)
+    * [Testing](#testing2)
+    * [Demo Clip](#demo2)
 3. [Technical Decisions](#technical-decisions)
 4. [Known Issues/Limitations](#known-issueslimitations)
 5. [Potential Enhancements](#potential-enhancements)
@@ -718,13 +728,17 @@ TOTAL                                  176      0   100%
 ===================================================================== 39 passed in 0.74s ======================================================================
 ```
 
+### Demo Clip
+
+Please check [here](https://youtu.be/SeMjE_R_2AE)
+
 ## Run In Container
 
-### Prerequisites
+### Prerequisites<a id="prerequisites2"></a>
 
 * docker
 
-### Preparation
+### Preparation<a id="preparation2"></a>
 
 * build docker image
 
@@ -732,7 +746,7 @@ TOTAL                                  176      0   100%
 docker build -t crawler .
 ```
 
-### Running
+### Running<a id="running2"></a>
 
 Similar to the local version, we can run:
 
@@ -742,7 +756,20 @@ bash -c 'export PYTHONPATH=$(pwd) && poetry run python app/main.py --help'
 ```
 
 ```text
+anphan@Ans-MacBook-Pro app-store_crawler % docker run -it --rm crawler \
+bash -c 'export PYTHONPATH=$(pwd) && poetry run python app/main.py --help'
+usage: main.py [-h] [-v] [-b] [-s SLOW_MO] -n COMPANY_NAME
 
+craw all apps info from the company.
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         print out data during progress
+  -b, --browser         show browser if possible
+  -s SLOW_MO, --slow_mo SLOW_MO
+                        slow down by an amount of milliseconds
+  -n COMPANY_NAME, --company_name COMPANY_NAME
+                        specify company name
 ```
 
 For example,
@@ -753,19 +780,72 @@ bash -c 'export PYTHONPATH=$(pwd) && poetry run python app/main.py -v -n netflix
 ```
 
 ```text
-
+anphan@Ans-MacBook-Pro app-store_crawler % docker run -it --rm crawler \
+bash -c 'export PYTHONPATH=$(pwd) && poetry run python app/main.py -v -n netflix'
+=> Found companies
+{
+    "netflix-inc": "https://apps.apple.com/vn/developer/netflix-inc/id363590054",
+    "iqiyi-international-singapore-pte-ltd": "https://apps.apple.com/vn/developer/iqiyi-international-singapore-pte-ltd/id1512375522",
+    "pixel-web-design": "https://apps.apple.com/vn/developer/pixel-web-design/id1482651454",
+    "digital-tools-ltd": "https://apps.apple.com/vn/developer/digital-tools-ltd/id852921471",
+    "google-llc": "https://apps.apple.com/vn/developer/google-llc/id281956209",
+    "apple": "https://apps.apple.com/vn/developer/apple/id284417353?mt=12"
+}
+=> Best match name: netflix-inc | https://apps.apple.com/vn/developer/netflix-inc/id363590054
+=> App urls to be crawled
+[
+    "https://apps.apple.com/vn/app/raji-an-ancient-epic/id1616746285",
+    "https://apps.apple.com/vn/app/terra-nil/id1643974911",
+    "https://apps.apple.com/vn/app/highwater/id1634668889",
+...
 ```
 
 
-### Testing
+### Testing<a id="testing2"></a>
 
 ```shell
 docker run -it --rm crawler bash -c 'export PYTHONPATH=$(pwd) && poetry run pytest --cov'
 ```
 
 ```text
+anphan@Ans-MacBook-Pro app-store_crawler % docker run -it --rm crawler bash -c 'export PYTHONPATH=$(pwd) && poetry run pytest --cov'
+================================================================== test session starts ===================================================================
+platform linux -- Python 3.10.11, pytest-7.3.0, pluggy-1.0.0
+rootdir: /app-store_crawler
+plugins: cov-4.0.0
+collected 39 items                                                                                                                                       
 
+tests/unit/test_appinfoparser.py ............                                                                                                      [ 30%]
+tests/unit/test_parsers.py ..                                                                                                                      [ 35%]
+tests/unit/test_utils.py .........................                                                                                                 [100%]
+
+---------- coverage: platform linux, python 3.10.11-final-0 ----------
+Name                                 Stmts   Miss  Cover
+--------------------------------------------------------
+app/__init__.py                          0      0   100%
+app/parsers.py                          29      0   100%
+app/utils.py                            57      0   100%
+tests/__init__.py                        0      0   100%
+tests/data/__init__.py                   0      0   100%
+tests/data/snapshots/__init__.py         1      0   100%
+tests/data/snapshots/base.py             2      0   100%
+tests/integration/__init__.py            0      0   100%
+tests/integration/test_crawlers.py       0      0   100%
+tests/unit/__init__.py                   0      0   100%
+tests/unit/test_appinfoparser.py        32      0   100%
+tests/unit/test_parsers.py               7      0   100%
+tests/unit/test_utils.py                48      0   100%
+--------------------------------------------------------
+TOTAL                                  176      0   100%
+
+
+=================================================================== 39 passed in 0.63s ===================================================================
 ```
+
+### Demo Clip<a id="demo2"></a>
+
+Please check [here](https://youtu.be/v-ZAjcIzDwc)
+
 
 ## Technical decisions
 
@@ -790,8 +870,8 @@ There are still issues/limitations to be taken care of:
 
 ## Potential enhancements:
 
-Still, there is a lot to consider, so I haven't yet implement integration tests. But I do manually test myself,
-you can check [here](https://youtu.be/SeMjE_R_2AE).
+Still, there is a lot to consider, so I haven't yet implement integration tests. 
+But I do manually test myself as in two demo clips above.
 
 If I have more time/resources, I can do:
 * Stealth mode: make use of context settings such as user-agent, proxy, ..., in order to bypass fingerprint check
